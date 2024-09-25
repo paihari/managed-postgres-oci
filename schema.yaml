@@ -1,0 +1,266 @@
+title: "Create OCI Managed Postgres Database "
+stackDescription: "Stack deploys the Fully Managed OCI Stack for Postgres DB"
+schemaVersion: 1.1.0
+version: "20190404"
+locale: "en"
+
+variableGroups:
+  - title: General Configuration
+    visible: false
+    variables:
+    # - tenancy_id
+    # - region
+
+  - title: Required Configuration
+    variables:  
+    - compartment_id
+    - db_system_db_version
+    - db_system_display_name
+    - db_system_shape
+    - db_system_instance_count
+    - db_system_instance_memory_size_in_gbs
+    - db_system_instance_ocpu_count
+    - db_system_storage_details_is_regionally_durable
+    - db_system_credentials_password_details_password_type
+    - db_system_credentials_password_details_password
+    - db_system_credentials_username
+    - db_system_storage_details_system_type
+    - vcn_cidr_block
+    - vcn_display_name
+    - public_subnet_cidr_block
+    - private_subnet_cidr_block
+    - public_subnet_display_name
+    - private_subnet_display_name
+    - internet_gateway_name
+    - service_gateway_displayname
+    - public_subnet_security_list_display_name
+    - private_subnet_security_list_display_name
+    - public_subnet_route_table_display_name
+    - private_subnet_route_table_display_name
+    - compute_shape
+    - compute_cpus
+    - compute_memory_in_gbs
+    - compute_ssh_authorized_keys
+    - api_private_key_for_ssh
+    - source_operating_system_image_id
+    - compute_instance_display_name    
+
+
+
+variables:
+  tenancy_id:
+    description: "Tenancy ID where to create resources for Requestor Tenancy"
+    type: string
+    reuired: true
+    visible: false
+    title: "Tenancy OCID"
+
+  region:
+    type: oci:identity:region:name
+    required: true
+    visible: false
+    title: Region
+    description: "Region where you want to deploy the resources defined by this stack."
+
+  compartment_id:
+    type: oci:identity:compartment:id
+    required: true
+    visible: true
+    title: Compartment
+    description: "Compartment where you want to create the solution resources"
+
+  db_system_db_version:
+    description: "Version of PostgreSQL"
+    type: number
+    default: 14
+    visible: false
+
+  db_system_display_name:
+    description: "PostgreSQL DB system display name"
+    type: string
+    default: "psqlfromterraform"
+    visible: false
+
+  db_system_shape:
+    description: "DB system shape (PostgreSQL VM Shape)"
+    type: string
+    default: "PostgreSQL.VM.Standard.E4.Flex.4.64GB"
+    visible: false
+
+  db_system_instance_count:
+    description: "Number of instances in the DB system"
+    type: number
+    default: 3
+    visible: false
+
+  db_system_instance_memory_size_in_gbs:
+    description: "Instance memory size in GBs"
+    type: number
+    default: 64
+    visible: false
+
+  db_system_instance_ocpu_count:
+    description: "Number of OCPUs for the DB system instance"
+    type: number
+    default: 4
+    visible: false
+
+  db_system_storage_details_is_regionally_durable:
+    description: "Is regionally durable storage"
+    type: boolean
+    default: true
+    visible: false
+
+  db_system_credentials_password_details_password_type:
+    description: "Password type (PLAIN_TEXT)"
+    type: string
+    default: "PLAIN_TEXT"
+    visible: false
+
+
+  db_system_credentials_password_details_password:
+    description: "Administrator password must be between 8 and 32 characters, and contain at least 1 uppercase, 1 lowercase, 1 numeric, and 1 special characters."
+    type: string
+    visible: true
+    required: true
+    title: "ADMIN Database Password"
+
+  db_system_credentials_username:
+    description: "The administrator username is required to be between 1 and 32 characters and it must not contain any of the following symbols: any quotes or any of the following reserved names: ocirpl, ociadmin, administrator, postgresql.sys, postgresql.session, postgresql.infoschema."
+    type: string
+    default: "admin"
+    visible: true
+    required: true
+    title: "ADMIN Database Username"
+
+
+  db_system_storage_details_system_type:
+    description: "System type for DB storage (e.g. OCI_OPTIMIZED_STORAGE)"
+    type: string
+    default: "OCI_OPTIMIZED_STORAGE"
+    visible: false
+
+  vcn_cidr_block:
+    description: "VCN CIDR block for the network"
+    type: string
+    default: "172.16.0.0/16"
+    visible: true
+    title: "VCN CIDR"
+
+  vcn_display_name:
+    description: "VCN display name"
+    type: string
+    default: "vcn-from-tf-psql"
+    visible: false
+
+  public_subnet_cidr_block:
+    description: "Public subnet CIDR block"
+    type: string
+    default: "172.16.1.0/24"
+    visible: true
+    required: true
+    title: "Public subnet CIDR"
+
+  private_subnet_cidr_block:
+    description: "Private subnet CIDR block"
+    type: string
+    default: "172.16.2.0/24"
+    visible: true
+    required: true
+    title: "Private Subnet CIDR"
+
+  public_subnet_display_name:
+    description: "Public subnet display name"
+    type: string
+    default: "public-subnet"
+    visible: false
+
+  private_subnet_display_name:
+    description: "Private subnet display name"
+    type: string
+    default: "private-subnet"
+    visible: false
+
+  internet_gateway_name:
+    description: "Internet gateway display name"
+    type: string
+    default: "internetgateway"
+    visible: false
+
+
+  service_gateway_displayname:
+    description: "Service gateway display name"
+    type: string
+    default: "servicegateway"
+    visible: false
+
+  public_subnet_security_list_display_name:
+    description: "Public subnet security list display name"
+    type: string
+    default: "public_subnet_security_list"
+    visible: false
+
+  private_subnet_security_list_display_name:
+    description: "Private subnet security list display name"
+    type: string
+    default: "private_subnet_security_list"
+    visible: false
+
+  public_subnet_route_table_display_name:
+    description: "Public subnet route table display name"
+    type: string
+    default: "public_subnet_route_table"
+    visible: false
+
+  private_subnet_route_table_display_name:
+    description: "Private subnet route table display name"
+    type: string
+    default: "private_subnet_route_table"
+    visible: false
+
+  compute_shape:
+    description: "Shape of the compute instance"
+    type: string
+    default: "VM.Standard.E4.Flex"
+    visible: false
+
+  compute_cpus:
+    description: "Number of OCPUs for the compute instance"
+    type: string
+    default: "1"
+    visible: false
+
+  compute_memory_in_gbs:
+    description: "Memory in GBs for the compute instance"
+    type: string
+    default: "1"
+    visible: false
+
+  compute_ssh_authorized_keys:
+    description: "Path to the SSH authorized public key file"
+    type: oci:core:ssh:publickey
+    visible: true
+    required: true
+    title: "Public Key for Instance"
+
+  api_private_key_for_ssh:
+    description: "Path to the private key used for SSH access"
+    type: oci:core:ssh:publickey
+    visible: true
+    required: true
+    title: "Private Key for SSH Access"
+
+  source_operating_system_image_id:
+    description: "OCID of the source operating system image"
+    type: string
+    default: "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaa5ww2sv5lpmouczvhp3e3udhrpngoribmotinvw734lti2avkktwa"
+    visible: true
+    required: true
+    title: "Instance Image ID"
+
+  compute_instance_display_name:
+    description: "Display name of the compute instance"
+    type: string
+    default: "Compute Instance"
+    visible: false
+
